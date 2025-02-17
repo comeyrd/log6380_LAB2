@@ -3,13 +3,13 @@ class AbstractSeed:
     It is necessary to create a power schedule that assigns energy to seeds.
     """
 
-    def __init__(self, data: str) -> None:
+    def __init__(self, data: str,coverage=0,energy=0.0,execution_time=0) -> None:
         """Initialize from seed data"""
         self.data = data
 
-        # These will be needed for advanced power schedules
-        self.coverage = 0
-        self.energy = 0.0
+        self.coverage = coverage
+        self.energy = energy
+        self.execution_time = execution_time
 
     def __str__(self) -> str:
         """Returns data as string representation of the seed"""

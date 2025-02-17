@@ -13,7 +13,7 @@ class AbstractFuzzer(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def _update(self, input):
+    def _update(self, input,coverage,execution_time,exceptions):
         """Update the fuzzer with based on the result of the input evaluation.
         Results are stored in the data attribute of the fuzzer.
         """
@@ -41,7 +41,7 @@ class AbstractFuzzer(abc.ABC):
                 self.data["coverage"].append(current_coverage)
                 self.data["execution_times"].append(execution_time)
                 self.data["exceptions"] += exceptions
-                self._update(input)
+                self._update(input,current_coverage,execution_time,exceptions)
 
         except Exception as e:
             print(f"Error: {str(e)}")
