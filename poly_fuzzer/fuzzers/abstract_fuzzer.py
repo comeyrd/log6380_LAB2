@@ -45,5 +45,6 @@ class AbstractFuzzer(abc.ABC):
 
         except Exception as e:
             print(f"Error: {str(e)}")
+            raise e
 
         return self.data

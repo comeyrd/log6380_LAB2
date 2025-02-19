@@ -27,8 +27,8 @@ class AbstractGrammar:
     def generate_input(
         self,
         start_symbol="<start>",
-        max_nonterminals: int = 10,
-        max_expansion_trials: int = 100,
+        max_nonterminals: int = 100,
+        max_expansion_trials: int = 150,
         log: bool = False,
     ) -> str:
         """Produce a string from `grammar`.
@@ -62,7 +62,7 @@ class AbstractGrammar:
                 expansion_trials += 1
                 if expansion_trials >= max_expansion_trials:
                     print("Cannot expand " + repr(term))
-
+        term = term.replace("[","<").replace("]",">")
         return term
 
 

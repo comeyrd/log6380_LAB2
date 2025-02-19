@@ -28,6 +28,7 @@ class AbstractExecutor:
             execution_time = end_time - start_time
             sys.settrace(None)
         except Exception as e:
+            print(e)
             exceptions += 1
             end_time = time.time()
             execution_time = end_time - start_time

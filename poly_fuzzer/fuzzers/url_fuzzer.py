@@ -6,14 +6,7 @@ from poly_fuzzer.power_schedules.abstract_power_schedule import AbstractPowerSch
 
 
 
-class MutationFuzzer(AbstractFuzzer):
-    """
-    # The `MutationFuzzer` class is a fuzzer that generates new inputs by mutating existing seeds using
-    # various mutation techniques.
-    A fuzzer that mutates the seed to generate new inputs.
-    #https://www.fuzzingbook.org/html/MutationFuzzer.html
-    """
-
+class URLFuzzer(AbstractFuzzer):
     def __init__(
         self,
         executor,
@@ -25,18 +18,20 @@ class MutationFuzzer(AbstractFuzzer):
         super().__init__(executor)
         self.seeds = seeds
         self.seed_index = 0
+        self.base_seeds = len(seeds)
         self.executor = executor
         self.power_schedule = power_schedule
         self.min_mutations = min_mutations
         self.max_mutations = max_mutations
-        self.mutators = [self._delete_random_character, self._replace_random_character]
+        self.mutators = [self._delete_random_character, self._replace_random_character,self._insert_random_character]
 
     def generate_input(self):
 
         """Mutate the seed to generate input for fuzzing.
         With this function we first use the gien seeds to generate inputs 
         and then we mutate the seeds to generate new inputs."""
-        if self.seed_index < len(self.seeds):
+
+        if self.seed_index < self.base_seeds:
             # Still seeding
             inp = self.seeds[self.seed_index].data
             self.seed_index += 1
@@ -46,20 +41,34 @@ class MutationFuzzer(AbstractFuzzer):
 
         return inp
 
-    def _update(self, input):
+    def find_seed_index(self,input):
+        for index, seed in enumerate(self.seeds):
+            if seed.data == input:
+                return index
+        return None
+    def _update(self, input,coverage,execution_time,exceptions):
         """Update the fuzzer with the input and its coverage."""
-        if len(self.data["coverage"]) > 1:
-            if self.data["coverage"][-1] > self.data["coverage"][-2]:
-                self.seeds.append(AbstractSeed(input))
-
+        s_ix = self.find_seed_index(input)
+        if exceptions !=0:
+            if s_ix is not None:
+                self.seeds.pop(s_ix)
+                print("Popped : ",input," because of error")
+            return 
+            
+        new_seed = AbstractSeed(input,coverage=coverage,execution_time=execution_time)
+        if s_ix is not None:
+            self.seeds[s_ix] = new_seed
+        else:
+            self.seeds.append(new_seed)
+        return
+    
     def _create_candidate(self):
-        seed = np.random.choice(self.seeds)
-
         # Stacking: Apply multiple mutations to generate the candidate
         if self.power_schedule:
             candidate = self.power_schedule.choose(self.seeds).data
         else:
-            candidate = seed.data
+            candidate = np.random.choice(self.seeds).data
+
         # Apply power schedule to generate the candidate
         #
         trials = random.randint(self.min_mutations, self.max_mutations)
@@ -93,3 +102,5 @@ class MutationFuzzer(AbstractFuzzer):
         pos = random.randint(0, len(s) - 1)
         random_character = chr(random.randrange(32, 127))
         return s[:pos] + random_character + s[pos + 1 :]
+    
+
