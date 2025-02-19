@@ -22,7 +22,7 @@ class URL_Power_schedule:
         mean_et = np.mean([seed.execution_time for seed in seeds])
         mean_cov = np.mean([seed.coverage for seed in seeds])
         for seed in seeds:
-            seed.energy = seed.coverage / mean_cov  + seed.execution_time / mean_et
+            seed.energy = 2 * seed.coverage / mean_cov  - seed.execution_time / mean_et
         return seeds
 
     def _normalized_energy(self, seeds: list[AbstractSeed]) -> list[float]:
